@@ -1,4 +1,4 @@
-name: Programming Assignment 2 check
+name: trova-ricetta check
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
   test:
     env:
       ORG: "uazhlt"
-      IMAGE_NAME: "ling-508-pa-week2"
+      IMAGE_NAME: "ling-508-project"
       TAG: "latest"
     runs-on: ubuntu-latest
     steps:
