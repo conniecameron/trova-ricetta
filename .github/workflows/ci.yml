@@ -1,4 +1,4 @@
-name: trova-ricetta check
+name: trova ricetta check
 
 on:
   push:
@@ -10,19 +10,20 @@ jobs:
   test:
     env:
       ORG: "uazhlt"
-      IMAGE_NAME: "ling-508-project"
+      IMAGE_NAME: "ling-508-pa-week4"
       TAG: "latest"
     runs-on: ubuntu-latest
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:latest
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: ricetta
         ports:
-          - 32000:3306
+          - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -31,4 +32,4 @@ jobs:
           docker build . --file Dockerfile --tag ${ORG}/${IMAGE_NAME}:${TAG}
       - name: Run the tests
         run: |
-          docker run -i ${ORG}/${IMAGE_NAME}:${TAG} python -m pytest tests
+          docker run -i --network ${{ job.services.mysql.network }} ${ORG}/${IMAGE_NAME}:${TAG} python -m pytest tests
