@@ -4,5 +4,5 @@ import abc
 class Repository(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def load_ricetta(self):
+    def load_ingredients(self):
         raise NotImplementedError
