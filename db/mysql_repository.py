@@ -33,7 +33,8 @@ class MysqlRepository(Repository):
         return [row[0] for row in result]
 
     def __del__(self):
-        self.connection.close()
+        if hasattr(self, 'connection') and self.connection.is_connected():
+            self.connection.close()
 
 if __name__ == "__main__":
     try:
