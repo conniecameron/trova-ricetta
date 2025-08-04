@@ -26,6 +26,11 @@ class MysqlRepository(Repository):
         result = self.cursor.fetchone()
         return result[0] if result else 0
 
+    def check_mealtype(self):
+        sql = 'SELECT DISTINCT meal_type_id FROM Recipe;'
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        return [row[0] for row in result]
 
     def __del__(self):
         self.connection.close()

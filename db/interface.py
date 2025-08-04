@@ -6,3 +6,7 @@ class Repository(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def load_ingredients(self):
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def check_mealtype(self):
+        raise NotImplementedError
