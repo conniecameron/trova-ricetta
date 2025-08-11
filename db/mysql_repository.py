@@ -20,7 +20,8 @@ class MysqlRepository(Repository):
             'database': 'ricetta'
         }
         self.connection = mysql.connector.connect(**config)
-        self.cursor = self.connection.cursor()
+        #self.cursor = self.connection.cursor()
+        self.cursor = self.connection.cursor(dictionary=True)
 
     def load_ingredients(self):
         sql = 'SELECT COUNT(*) FROM Ingredient;'
@@ -29,10 +30,10 @@ class MysqlRepository(Repository):
         return result[0] if result else 0
 
     def check_mealtype(self):
-        sql = 'SELECT DISTINCT meal_type_id FROM Recipe;'
+        sql = 'SELECT DISTINCT meal_type FROM Recipe;'
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
-        return [row[0] for row in result]
+        return [row["meal_type"] for row in result]
 
     def load_recipes_from_db(self) -> RecipeList:
 

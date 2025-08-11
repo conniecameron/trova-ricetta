@@ -1,0 +1,43 @@
+from app.trova_ricetta import *
+from app.services import *
+from db.mysql_repository import *
+
+services = Services()
+repo = MysqlRepository()
+
+def test_load_recipes_from_db():
+    assert services.load_recipes_from_db().list_recipes().__len__() == 5
+
+def test_recipe_finder():
+    rl = services.load_recipes_from_db()
+    meal_type = services.get_meal_type_from_input("dolce")
+    ingredients = services.get_ingredient_objects(["uova", "farina", "latte"])
+
+    '''Single matching recipe'''
+    matches = services.find_recipes_in_list(meal_type, ingredients, rl)
+    #checks that it returns a List:Recipe
+    assert isinstance(matches, List)
+    # checks that matching recipe is returned
+    assert [r.title for r in matches] == ["Torta Margherita"]
+    out = services.format_recipe_results(matches)
+    assert out == "1) 01 — Torta Margherita [DOLCE] — 5 ingredienti"
+
+    '''Multiple matching recipes'''
+    meal_type = services.get_meal_type_from_input("secondo")
+    ingredients = services.get_ingredient_objects(["cipolla", "parmigiano", "olio d'oliva"])
+    matches = services.find_recipes_in_list(meal_type, ingredients, rl)
+    # checks that multiple matching recipes are returned
+    assert len(matches) == 2
+
+    '''No matching recipe'''
+    meal_type = services.get_meal_type_from_input("dolce")
+    ingredients = services.get_ingredient_objects(["cipolla", "farina", "latte"])
+    matches = services.find_recipes_in_list(meal_type, ingredients, rl)
+    assert [r.title for r in matches] == []
+    out = services.format_recipe_results(matches)
+    assert out == "Nessuna ricetta trovata."
+
+
+
+
+
