@@ -22,13 +22,14 @@ class Services:
     def get_ingredient_objects(names: List[str]) -> List[Ingredient]:
         return [Ingredient(name) for name in names]
 
+    # ALL ingredients must be present on the recipe
     def find_recipes_by_meal_and_ingredients(
             meal_type: MealType,
             ingredients: List[Ingredient],
             recipes: List[Recipe]
     ) -> List[Recipe]:
 
-        wanted = {ing.name_italian for ing in ingredients}  # Ingredient stores lowercase in your class
+        wanted = {ing.name_italian for ing in ingredients}
         matches: List[Recipe] = []
         for r in recipes:
             if r.meal_type != meal_type:
@@ -43,7 +44,27 @@ class Services:
             ingredients: List[Ingredient],
             recipe_list: RecipeList
     ) -> List[Recipe]:
-        """Convenience wrapper if you have a RecipeList instance."""
         return find_recipes_by_meal_and_ingredients(meal_type, ingredients, recipe_list.recipes)
+
+    #Convert the list of Recipe objects into a presentable format, error message if recipe not found.
+    def format_recipe_results(recipes: List[Recipe]) -> str:
+
+        #Example output:
+        #1) 01 — Torta Margherita [DOLCE] — 5 ingredienti
+        #2) 05 — Frittata di Cipolle [SECONDO] — 4 ingredienti
+
+        if not recipes:
+            return "Nessuna ricetta trovata."
+
+        lines = []
+        for idx, r in enumerate(recipes, start=1):
+            ingredient_count = len(r.ingredients)
+            ingrediente_label = "ingrediente" if ingredient_count == 1 else "ingredienti"
+            lines.append(f"{idx}) {r.id} — {r.title} [{r.meal_type.name}] — {ingredient_count} {ingrediente_label}")
+        return "\n".join(lines)
+
+    #lpulls the data straight from MySQL
+    def load_recipes_from_db(self):
+        self.repo.
 
 

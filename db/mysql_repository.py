@@ -1,4 +1,6 @@
 import mysql.connector
+
+from app.trova_ricetta import *
 from db.interface import *
 
 
@@ -31,6 +33,50 @@ class MysqlRepository(Repository):
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         return [row[0] for row in result]
+
+    def load_recipes_from_db(self) -> RecipeList:
+
+        #Recipes
+        sql = 'SELECT id, title, meal_type FROM Recipe ORDER BY id;'
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        recipes = {row["id"]: row for row in result}
+
+        #Ingredients per recipe
+        sql = """SELECT ri.recipe_id, i.name_italian AS name, ri.quantity 
+                 FROM RecipeIngredient ri JOIN Ingredient i ON i.id = ri.ingredient_id
+                 ORDER BY ri.recipe_id, i.name_italian;"""
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        ing_map = {}
+        for row in result:
+            ing_map.setdefault(row["recipe_id"], []).append(
+                IngredientAmount(Ingredient(row["name"]), row["quantity"])
+        )
+
+        #Steps per recipe
+        sql = """SELECT recipe_id, step_number, text
+            FROM RecipeStep
+            ORDER BY recipe_id, step_number;"""
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        step_map = {}
+        for row in result:
+            step_map.setdefault(row["recipe_id"], []).append(row["text"])
+
+        # Assemble objects
+        recipe_list = RecipeList()
+        for rid, r in recipes.items():
+            recipe_list.add_recipe(
+                Recipe(
+                    id=rid,
+                    title=r["title"],
+                    meal_type=MealType[r["meal_type"]],
+                    ingredients=ing_map.get(rid, []),
+                    steps=step_map.get(rid, []),
+                )
+            )
+        return recipe_list
 
     def __del__(self):
         if hasattr(self, 'connection') and self.connection.is_connected():
