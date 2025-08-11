@@ -3,7 +3,6 @@ DROP DATABASE IF EXISTS ricetta;
 CREATE DATABASE ricetta CHARACTER SET utf8 COLLATE utf8_unicode_ci;;
 USE ricetta;
 
-
 CREATE TABLE MealType (
     id INT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
@@ -153,9 +152,13 @@ INSERT INTO RecipeStep (recipe_id, step_number, text, verbs) VALUES
 ('05', 3, 'Cuoci in padella fino a doratura.', JSON_ARRAY('cuocere'));
 
 -- Sample recipe list and its items
+-- Recipe list and ordered membership (no window functions)
 INSERT INTO RecipeList (name) VALUES ('Ricette Facili');
+SET @pos := 0;
 INSERT INTO RecipeListItem (recipe_list_id, recipe_id, position)
-SELECT rl.id, r.id, ROW_NUMBER() OVER (ORDER BY r.id)
+SELECT rl.id, r.id, (@pos := @pos + 1) AS position
 FROM RecipeList rl
-JOIN Recipe r ON 1=1
-WHERE rl.name = 'Ricette Facili';
+JOIN Recipe r
+  ON 1=1
+WHERE rl.name = 'Ricette Facili'
+ORDER BY r.id;
