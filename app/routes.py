@@ -64,7 +64,6 @@ def create_app():
             )
 
             if not matches:
-                # 404 is appropriate for "no matches" in a search endpoint
                 return error("Nessuna ricetta trovata.", HTTPStatus.NOT_FOUND)
 
             # Success payload
@@ -83,7 +82,7 @@ def create_app():
 
         except Exception as e:
             # Catch-all
-            return error(f"Search failed: {e}", HTTPStatus.NOT_FOUND)
+            return error(f"Search failed: {e}", HTTPStatus.INTERNAL_SERVER_ERROR)
 
     # Health Check and Error handling
     def error(message: str, code: HTTPStatus):
