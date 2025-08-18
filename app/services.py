@@ -46,14 +46,6 @@ class Services:
                 matches.append(r)
         return matches
 
-    def find_recipes_in_list(
-            self,
-            meal_type: MealType,
-            ingredients: List[Ingredient],
-            recipe_list: RecipeList
-    ) -> List[Recipe]:
-        return self.find_recipes_by_meal_and_ingredients(meal_type, ingredients, recipe_list.recipes)
-
     #Convert the list of Recipe objects into a presentable format, error message if recipe not found.
     def format_recipe_results(self, recipes: List[Recipe]) -> str:
 
@@ -75,19 +67,17 @@ class Services:
     def load_recipes_from_db(self):
         return self.repo.load_recipes_from_db()
 
-if __name__ == "__main__":
-    if __name__ == "__main__":
-        sl = Services()
-        rl = sl.load_recipes_from_db()
-        print("\n".join(rl.list_recipes()))
+F
+    sl = Services()
+    rl = sl.load_recipes_from_db()
+    print("\n".join(rl.list_recipes()))
 
-        meal_type = sl.get_meal_type_from_input("dolce")
-        ingredients = sl.get_ingredient_objects(["uova", "farina", "latte"])
+    meal_type = sl.get_meal_type_from_input("dolce")
+    ingredients = sl.get_ingredient_objects(["uova", "farina", "latte"])
 
-        #matches = sl.find_recipes_in_list(meal_type, ingredients, rl.recipes)
-        matches = sl.find_recipes_in_list(meal_type, ingredients, rl)
-        print(sl.find_recipes_in_list(meal_type, ingredients, rl))
-        print(sl.format_recipe_results(matches))
+    matches = sl.find_recipes_by_meal_and_ingredients(meal_type, ingredients, rl)
+    #print(sl.find_recipes_by_meal_and_ingredients(meal_type, ingredients, rl))
+    #print(sl.format_recipe_results(matches))
 
 
 
