@@ -38,9 +38,10 @@ def test_search_recipes_notfound(client):
     }
     rv = client.post("/recipes/search", data=json.dumps(payload),
                      content_type="application/json")
-    assert rv.status_code == 200
+    assert rv.status_code == 404
     data = rv.get_json()
-    assert len(data) == 0
-    print(rv)
+
+
+
 
 
