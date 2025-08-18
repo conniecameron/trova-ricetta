@@ -1,4 +1,3 @@
-# Accessing the API directly
 ### **Base URL**
 
 http://127.0.0.1:5000
@@ -67,7 +66,23 @@ Search for recipes by meal type and ingredients. The service:
 
 {"error":{"code":404,"message":"Nessuna ricetta trovata."}}
 
-# Accessing the API via HTML form
+### Accessing the API directly
+**cURL**
+
+#### Health
+curl -s http://127.0.0.1:5000/health
+
+#### All recipes
+curl -s http://127.0.0.1:5000/recipes/all | jq
+
+#### Search (≥3 ingredient matches)
+curl -s -X POST http://127.0.0.1:5000/recipes/search \
+  -H "Content-Type: application/json" \
+  -d '{"meal_type":"dolce","ingredients":["uova","farina","latte"],"min_matches":3}' | jq
+
+### Accessing the API via HTML form
+
+http://127.0.0.1:5000/docs/search
 
 1) Select a meal type from the **Meal Type** dropdown
 2) Select ingredients from the **Ingredients** checklist

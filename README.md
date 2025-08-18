@@ -58,4 +58,7 @@ Search recipes by:
     documents/documentation.md
 
 ## HTML Form Access
-You can also interact via a form.
+You can also interact via form http://127.0.0.1:5000/docs/search
+
+web/trova_ricetta.html
+

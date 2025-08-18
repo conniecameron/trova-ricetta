@@ -1,9 +1,10 @@
 from http import HTTPStatus
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, send_file
 from app.services import *
 
 def create_app():
-    app = Flask(__name__)
+    #app = Flask(__name__)
+    app = Flask(__name__, template_folder="/home/connie/PycharmProjects/trova-ricetta/web")
     services = Services()
 
     #Endpoint #1 Returns all recipes
@@ -92,6 +93,22 @@ def create_app():
     @app.route("/health", methods=["GET"])
     def health():
         return jsonify({"status": "ok"}), HTTPStatus.OK
+
+    # HTML integration
+    @app.route("/ingredients", methods=["GET"])
+    def ingredients():
+        rl = services.repo.load_recipes_from_db()
+        names = sorted({
+            ia.ingredient.name_italian
+            for r in rl.recipes
+            for ia in r.ingredients
+        })
+        return jsonify({"ingredients": names}), HTTPStatus.OK
+
+    @app.route("/docs/search", methods=["GET"])
+    def docs_search():
+        return render_template("trova_ricetta.html")
+        #return send_file("/home/connie/PycharmProjects/trova-ricetta/web/trova_ricetta.html")
 
     return app
 

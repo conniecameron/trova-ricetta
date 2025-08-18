@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Trova Ricetta</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    fieldset { margin-bottom: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .5rem .75rem; max-width: 900px; }
+    .results { white-space: pre-wrap; border: 1px solid #ddd; padding: .75rem; border-radius: .5rem; min-height: 3rem; }
+  </style>
+</head>
+<body>
+  <h1>Trova Ricetta</h1>
+
+  <form id="searchForm">
+    <fieldset>
+      <legend>Meal Type</legend>
+      <select id="meal_type" required>
+        <option value="antipasto">ANTIPASTO</option>
+        <option value="primo">PRIMO</option>
+        <option value="secondo">SECONDO</option>
+        <option value="dolce" selected>DOLCE</option>
+      </select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ingredients (check ≥ 3)</legend>
+      <div id="ingredientsGrid" class="grid">Loading ingredients…</div>
+    </fieldset>
+
+    <button type="submit">Search</button>
+  </form>
+
+  <h2>Results</h2>
+  <div id="results" class="results">—</div>
+
+  <script>
+    async function loadIngredients() {
+      const grid = document.getElementById("ingredientsGrid");
+      try {
+        const res = await fetch("/ingredients");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data.ingredients || []);
+        grid.innerHTML = "";
+        for (const name of list) {
+          const id = "ing_" + name.replace(/\\W+/g, "_");
+          const label = document.createElement("label");
+          label.htmlFor = id;
+          const cb = document.createElement("input");
+          cb.type = "checkbox"; cb.id = id; cb.name = "ingredients"; cb.value = name;
+          label.append(cb, document.createTextNode(" " + name));
+          grid.append(label);
+        }
+        // Pre-check common combo if present
+        ["uova","farina","latte"].forEach(n => {
+          const el = document.querySelector('input[name="ingredients"][value="'+n+'"]');
+          if (el) el.checked = true;
+        });
+      } catch (e) {
+        grid.textContent = "Could not load ingredients: " + e.message;
+      }
+    }
+
+    document.getElementById("searchForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const meal_type = document.getElementById("meal_type").value;
+      const ingredients = Array.from(document.querySelectorAll('input[name="ingredients"]:checked')).map(cb => cb.value);
+      const payload = { meal_type, ingredients };  // min_matches defaults in service layer
+
+      const res = await fetch("/recipes/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const out = document.getElementById("results");
+      const text = await res.text();
+      try { out.textContent = JSON.stringify(JSON.parse(text), null, 2); }
+      catch { out.textContent = "HTTP " + res.status + "\\n\\n" + text; }
+    });
+
+    loadIngredients();
+  </script>
+</body>
+</html>
