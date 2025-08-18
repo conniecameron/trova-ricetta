@@ -70,15 +70,13 @@ class Services:
 
 if __name__ == "__main__":
     sl = Services()
-    #meal_type = sl.get_meal_type_from_input("dolce")
-    meal_type = sl.get_meal_type_from_input("secondo")
+    meal_type = sl.get_meal_type_from_input("dolce")
+    #meal_type = sl.get_meal_type_from_input("secondo")
 
-    #ingredients = sl.get_ingredient_objects(["uova", "farina", "latte"])
-    ingredients = sl.get_ingredient_objects(["uova", "parmigiano", "cipolla", "olio d'oliva"])
+    ingredients = sl.get_ingredient_objects(["uova", "farina", "latte"])
+    #ingredients = sl.get_ingredient_objects(["parmigiano", "cipolla", "olio d'oliva"])
     #ingredients = sl.get_ingredient_objects(["nutella", "farina", "latte"])
     matches = sl.find_recipes_by_meal_and_ingredients(meal_type, ingredients)
     print(sl.format_recipe_results(matches))
-
-
 
 
