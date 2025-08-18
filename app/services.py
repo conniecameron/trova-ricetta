@@ -1,5 +1,3 @@
-from more_itertools import recipes
-
 import db.mysql_repository
 from app.trova_ricetta import *
 from typing import List
@@ -33,51 +31,53 @@ class Services:
             self,
             meal_type: MealType,
             ingredients: List[Ingredient],
-            recipes: List[Recipe]
+            min_matches: int = 3, #only 3 ingredients to match a recipe
     ) -> List[Recipe]:
 
+        # pulls the recipe list straight from MySQL db
+        recipe_list = self.repo.load_recipes_from_db()
+        recipes = recipe_list.recipes
+
         wanted = {ing.name_italian for ing in ingredients}
+        threshold = min(min_matches, len(wanted))  # if user provided <3, require all provided
+
         matches: List[Recipe] = []
         for r in recipes:
             if r.meal_type != meal_type:
                 continue
             recipe_names = set(r.get_ingredient_names())
-            if wanted.issubset(recipe_names):
+            overlap = len(wanted & recipe_names)
+            if overlap >= threshold:
                 matches.append(r)
         return matches
 
     #Convert the list of Recipe objects into a presentable format, error message if recipe not found.
-    def format_recipe_results(self, recipes: List[Recipe]) -> str:
+    def format_recipe_results(self, uf_recipes: List[Recipe]) -> str:
 
         #Example output:
         #1) 01 — Torta Margherita [DOLCE] — 5 ingredienti
         #2) 05 — Frittata di Cipolle [SECONDO] — 4 ingredienti
 
-        if not recipes:
+        if not uf_recipes:
             return "Nessuna ricetta trovata."
 
         lines = []
-        for idx, r in enumerate(recipes, start=1):
+        for idx, r in enumerate(uf_recipes, start=1):
             ingredient_count = len(r.ingredients)
             ingrediente_label = "ingrediente" if ingredient_count == 1 else "ingredienti"
             lines.append(f"{idx}) {r.id} — {r.title} [{r.meal_type.name}] — {ingredient_count} {ingrediente_label}")
         return "\n".join(lines)
 
-    #lpulls the data straight from MySQL
-    def load_recipes_from_db(self):
-        return self.repo.load_recipes_from_db()
-
-F
+if __name__ == "__main__":
     sl = Services()
-    rl = sl.load_recipes_from_db()
-    print("\n".join(rl.list_recipes()))
+    #meal_type = sl.get_meal_type_from_input("dolce")
+    meal_type = sl.get_meal_type_from_input("secondo")
 
-    meal_type = sl.get_meal_type_from_input("dolce")
-    ingredients = sl.get_ingredient_objects(["uova", "farina", "latte"])
-
-    matches = sl.find_recipes_by_meal_and_ingredients(meal_type, ingredients, rl)
-    #print(sl.find_recipes_by_meal_and_ingredients(meal_type, ingredients, rl))
-    #print(sl.format_recipe_results(matches))
+    #ingredients = sl.get_ingredient_objects(["uova", "farina", "latte"])
+    ingredients = sl.get_ingredient_objects(["uova", "parmigiano", "cipolla", "olio d'oliva"])
+    #ingredients = sl.get_ingredient_objects(["nutella", "farina", "latte"])
+    matches = sl.find_recipes_by_meal_and_ingredients(meal_type, ingredients)
+    print(sl.format_recipe_results(matches))
 
 
 
