@@ -1,6 +1,6 @@
 # Trova Ricetta
 
-A simple recipe search application built with Flask and MySQL, designed to help learners find Italian recipes by meal type and ingredients.
+A simple recipe search application built with Flask and MySQL, designed to help users find Italian recipes by meal type and ingredients.
 
 ## Features
 
