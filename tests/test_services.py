@@ -1,6 +1,4 @@
-from app.trova_ricetta import *
 from app.services import *
-#from db.mysql_repository import *
 
 services = Services()
 #repo = MysqlRepository()

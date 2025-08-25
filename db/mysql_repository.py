@@ -3,7 +3,6 @@ import mysql.connector
 from app.trova_ricetta import *
 from db.interface import *
 
-
 class MysqlRepository(Repository):
 
     def __init__(self):
@@ -88,6 +87,11 @@ if __name__ == "__main__":
         repo = MysqlRepository()
         print("Successfully connected to ricetta database")
         repo.cursor.execute("SHOW TABLES;")
-        print("Tables:", repo.cursor.fetchall())
+        print("Tables:\n", repo.cursor.fetchall())
+        repo.cursor.execute("SELECT * FROM Ingredient;")
+        print("Ingredients:\n", repo.cursor.fetchall())
+        repo.cursor.execute("SELECT * FROM Recipe LIMIT 5;")
+        print("Recipes:\n", repo.cursor.fetchall())
+
     except Exception as e:
         print("Connection failed:", e)

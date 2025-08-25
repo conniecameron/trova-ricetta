@@ -1,5 +1,6 @@
 import db.mysql_repository
 from app.trova_ricetta import *
+
 from typing import List
 
 class Services:
